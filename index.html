@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Your 2AM Friend — Master Content Engine</title>
+  <link rel="stylesheet" href="/style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+</head>
+<body>
+  <!-- TOP NAVBAR -->
+  <header class="navbar">
+    <div class="nav-brand">
+      <div class="brand-badge">2AM</div>
+      <div>
+        <h1 class="brand-title">Your 2AM Friend</h1>
+        <p class="brand-subtitle">Master Content Creation Engine & SEO / AEO Studio</p>
+      </div>
+    </div>
+    
+    <div class="nav-controls">
+      <div id="sheetStatusBadge" class="status-badge connecting">
+        <span class="pulse-dot"></span>
+        <span id="sheetStatusText">Connecting to Master Sheet...</span>
+      </div>
+      <button class="nav-tab active" data-tab="generatorTab">Generator</button>
+      <button class="nav-tab" data-tab="sheetExplorerTab">Internal Links Database</button>
+      <button class="nav-tab" data-tab="draftsTab">Saved Drafts</button>
+    </div>
+  </header>
+
+  <!-- MAIN CONTAINER -->
+  <main class="main-layout">
+    
+    <!-- GENERATOR TAB -->
+    <div id="generatorTab" class="tab-view active">
+      <div class="workspace-grid">
+        
+        <!-- LEFT COLUMN: INPUTS & SETTINGS -->
+        <aside class="sidebar-panel">
+          <div class="panel-header">
+            <h2>Content Parameters</h2>
+            <span class="badge-subtle">Step 0</span>
+          </div>
+
+          <form id="contentForm" onsubmit="event.preventDefault();">
+            <!-- Primary Keyword -->
+            <div class="form-group">
+              <label for="primaryKeyword">Primary Keyword <span class="req">*</span></label>
+              <input type="text" id="primaryKeyword" placeholder="e.g. how to end a situationship" required>
+              <span class="input-hint">Will be targeted 3-5 times strictly (H1, meta, intro, subhead, close).</span>
+            </div>
+
+            <!-- Secondary Keywords -->
+            <div class="form-group">
+              <label for="secondaryKeywords">Secondary Keywords <span class="req">* (at least 2)</span></label>
+              <textarea id="secondaryKeywords" rows="2" placeholder="e.g. situationship breakup, ending things with someone you're not dating, signs a situationship is over" required></textarea>
+              <span class="input-hint">Separate with commas. Each appears at least once.</span>
+            </div>
+
+            <!-- Competitor URLs -->
+            <div class="form-group">
+              <label for="competitorUrls">Competitor URL(s) <span class="req">* (at least 1)</span></label>
+              <textarea id="competitorUrls" rows="3" placeholder="https://moralrevolution.com/how-to-end-a-situationship/&#10;https://www.rula.com/blog/end-situationship/&#10;https://tenr.co/blog/how-to-end-a-situationship" required></textarea>
+              <span class="input-hint">One URL per line. We scrape & analyze structure & gaps.</span>
+            </div>
+
+            <!-- Category & Sub-Category -->
+            <div class="form-row">
+              <div class="form-group col-6">
+                <label for="category">Category <span class="req">*</span></label>
+                <select id="category" required>
+                  <option value="Relationship">Relationship</option>
+                  <option value="Mental Health">Mental Health</option>
+                  <option value="Family">Family</option>
+                  <option value="Motivation">Motivation</option>
+                  <option value="Self-Care">Self-Care</option>
+                </select>
+              </div>
+              <div class="form-group col-6">
+                <label for="subCategory">Sub-Category</label>
+                <input type="text" id="subCategory" placeholder="e.g. Dating, Breakup, Anxiety">
+              </div>
+            </div>
+
+            <!-- AI Configuration -->
+            <div class="collapsible-section">
+              <div class="collapsible-header" id="aiConfigToggle">
+                <span>Gemini AI Engine Settings</span>
+                <span class="toggle-icon">▼</span>
+              </div>
+              <div class="collapsible-body" id="aiConfigBody">
+                <div class="form-group">
+                  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+                    <label for="geminiApiKey" style="margin-bottom: 0;">Gemini API Key</label>
+                    <button type="button" id="btnRestoreDefaultKey" class="btn-sm" style="font-size: 10px; padding: 2px 8px; background: rgba(99, 102, 241, 0.15); border-color: var(--primary); color: #c7d2fe;" title="Load verified pre-configured Gemini key">⚡ Load Working Key</button>
+                  </div>
+                  <div class="input-with-button">
+                    <input type="password" id="geminiApiKey" placeholder="AQ.Ab8RN6... or AIzaSy..." autocomplete="off">
+                    <button type="button" id="toggleApiKeyBtn" class="btn-sm">Show</button>
+                    <button type="button" id="btnDetectModels" class="btn-sm btn-secondary" title="Test Key and Load Models">Verify</button>
+                  </div>
+                  <span id="modelDetectionResult" class="input-hint">Saved in browser. <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener">Get free Google AI Studio key</a></span>
+                </div>
+                <div class="form-group">
+                  <label for="geminiModel">Model</label>
+                  <select id="geminiModel">
+                    <option value="gemini-3.5-flash-lite" selected>Gemini 3.5 Flash-Lite (Recommended - Fast & No Cutoffs)</option>
+                    <option value="gemini-3.5-flash">Gemini 3.5 Flash</option>
+                    <option value="gemini-flash-latest">Gemini Flash Latest</option>
+                    <option value="gemini-3.8-flash">Gemini 3.8 Flash</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            <!-- Primary Buttons -->
+            <div class="button-stack">
+              <button type="button" id="btnScrapeOnly" class="btn btn-secondary">
+                🔍 1. Scrape Competitors
+              </button>
+              <button type="button" id="btnFindLinks" class="btn btn-secondary">
+                🔗 2. Find Database Internal Links
+              </button>
+              <button type="button" id="btnGenerateAll" class="btn btn-primary pulse-btn">
+                ⚡ 3. Generate Master Article
+              </button>
+              <div class="btn-group-2" style="margin-top: 4px;">
+                <button type="button" id="btnCopyPrompt" class="btn btn-secondary btn-sm" title="Copy assembled prompt with competitor intel and links to run anywhere">
+                  📋 Copy Prompt
+                </button>
+                <button type="button" id="btnOpenImportModal" class="btn btn-secondary btn-sm" title="Paste a draft generated from chat or another tool">
+                  📥 Paste Draft
+                </button>
+              </div>
+            </div>
+          </form>
+        </aside>
+
+        <!-- CENTER COLUMN: GENERATED ARTICLE & STAGES -->
+        <section class="main-content-panel">
+          
+          <!-- Progress Bar Banner -->
+          <div id="progressBanner" class="progress-banner hidden">
+            <div class="progress-spinner"></div>
+            <div class="progress-details">
+              <span id="progressStepTitle" class="progress-title">Executing Step 1: Competitor Analysis...</span>
+              <span id="progressStepDesc" class="progress-desc">Scraping URLs and analyzing search intent...</span>
+            </div>
+          </div>
+
+          <!-- Section Switcher Tabs -->
+          <div class="article-tabs">
+            <button class="stage-tab active" data-stage="stagePreview">Article Preview</button>
+            <button class="stage-tab" data-stage="stageGoogleDoc">📄 Complete Google Doc</button>
+            <button class="stage-tab" data-stage="stageCompetitor">Step 1: Competitor Intel</button>
+            <button class="stage-tab" data-stage="stageMetadata">Step 2 & 3: Intent & SEO</button>
+            <button class="stage-tab" data-stage="stageInternalLinks">Step 5: Internal Links</button>
+            <button class="stage-tab" data-stage="stageMarkdown">Raw Markdown</button>
+          </div>
+
+          <!-- STAGE CONTENT AREAS -->
+          
+          <!-- STAGE: ARTICLE PREVIEW -->
+          <div id="stagePreview" class="stage-panel active">
+            <div id="emptyArticleState" class="empty-state">
+              <div class="empty-icon">✍️</div>
+              <h3>Ready to write your next standout piece</h3>
+              <p>Fill out the keywords and competitor URLs on the left, then click <strong>"Generate Master Content"</strong>.</p>
+              <p class="sub-hint">The engine will adhere strictly to Your 2AM Friend's brand voice, strict 5th-grade readability, 0 em dashes, sentence limits (&le;20 words), and dynamic links from the Google Sheet.</p>
+            </div>
+
+            <div id="articleViewer" class="article-viewer hidden">
+              <div class="article-header-meta">
+                <span id="renderedCategoryBadge" class="cat-pill">Relationship</span>
+                <span id="renderedWordCountBadge" class="stat-pill">0 words</span>
+                <span id="renderedFleschBadge" class="stat-pill">Grade ~5.2</span>
+              </div>
+              <article id="renderedArticleContent" class="article-body typography">
+                <!-- Dynamic Generated Article Content Injected Here -->
+              </article>
+            </div>
+          </div>
+
+          <!-- STAGE: COMPLETE GOOGLE DOC VERSION (COMBINES STEP 1, 2, 3, 4) -->
+          <div id="stageGoogleDoc" class="stage-panel">
+            <div class="panel-inner">
+              <div class="gdoc-viewer-header">
+                <div>
+                  <h3>Complete Google Doc Version</h3>
+                  <p class="sub-hint">Step 1 Competitor Intel + Step 2 & 3 Intent & SEO Metadata + Step 4 Full Article combined into one exact document.</p>
+                </div>
+                <button type="button" id="btnCopyGoogleDocsFromTab" class="btn btn-gdocs btn-sm">
+                  📋 Copy Google Doc (Exact Copy)
+                </button>
+              </div>
+
+              <div id="gdocDocumentContainer" class="gdoc-paper-view">
+                <p class="placeholder-text">Generate or import an article to view the complete consolidated Google Doc version.</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- STAGE: COMPETITOR INTEL -->
+          <div id="stageCompetitor" class="stage-panel">
+            <div class="panel-inner">
+              <div class="intel-header">
+                <h3>Competitor Analysis & Search Intent</h3>
+                <span class="badge-subtle">Step 1 & 2</span>
+              </div>
+              
+              <div id="competitorScrapeCards" class="scrape-cards-container">
+                <p class="placeholder-text">Click "Scrape & Analyze Competitors" or "Generate Master Content" to load competitor data.</p>
+              </div>
+
+              <div id="competitorAnalysisBox" class="analysis-box hidden">
+                <h4>5-Point Competitor Evaluation</h4>
+                <div class="eval-grid">
+                  <div class="eval-item">
+                    <strong>1. Search Intent & Emotional State:</strong>
+                    <p id="evalIntentText">-</p>
+                  </div>
+                  <div class="eval-item">
+                    <strong>2. Structure & Length:</strong>
+                    <p id="evalStructureText">-</p>
+                  </div>
+                  <div class="eval-item">
+                    <strong>3. What They Did Well:</strong>
+                    <p id="evalStrengthsText">-</p>
+                  </div>
+                  <div class="eval-item">
+                    <strong>4. What They Missed:</strong>
+                    <p id="evalGapsText">-</p>
+                  </div>
+                  <div class="eval-item full-width highlight-item">
+                    <strong>5. Your Content Edge:</strong>
+                    <p id="evalEdgeText">-</p>
+                  </div>
+                </div>
+
+                <div class="search-intent-statement-box">
+                  <h4>Locked-in Search Intent Statement</h4>
+                  <blockquote id="lockedIntentStatement">
+                    "The person searching [PRIMARY KEYWORD] is looking for [intent] because they are feeling [specific emotional state]."
+                  </blockquote>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- STAGE: METADATA -->
+          <div id="stageMetadata" class="stage-panel">
+            <div class="panel-inner">
+              <h3>SEO & AEO Metadata (CTR-Optimized)</h3>
+              <div class="meta-card">
+                <div class="meta-field">
+                  <div class="meta-label-row">
+                    <label>Title Tag (Strict 50–55 chars)</label>
+                    <span id="titleCharCount" class="char-counter">0 / 55 chars</span>
+                  </div>
+                  <div class="meta-input-display" id="metaTitleDisplay">Not generated yet</div>
+                </div>
+
+                <div class="meta-field">
+                  <div class="meta-label-row">
+                    <label>Meta Description (Strict 120–150 chars)</label>
+                    <span id="descCharCount" class="char-counter">0 / 150 chars</span>
+                  </div>
+                  <div class="meta-input-display" id="metaDescDisplay">Not generated yet</div>
+                </div>
+
+                <div class="meta-field">
+                  <div class="meta-label-row">
+                    <label>URL Slug (Lowercase, hyphenated, primary keyword)</label>
+                  </div>
+                  <div class="meta-input-display slug-font" id="metaSlugDisplay">/not-generated-yet/</div>
+                </div>
+
+                <div class="meta-field">
+                  <div class="meta-label-row">
+                    <label>Target Category & Sub-Category</label>
+                  </div>
+                  <div class="meta-input-display" id="metaCategoryDisplay">Not set yet</div>
+                </div>
+
+                <div class="meta-field" style="margin-top: 6px;">
+                  <div class="meta-label-row">
+                    <label>Image Alt Text Descriptions (3–5 Contextual Descriptions)</label>
+                    <span id="altTextsCount" class="char-counter">0 / 5</span>
+                  </div>
+                  <div id="imageAltTextsList" class="alt-texts-container">
+                    <p class="placeholder-text">Not generated yet</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- STAGE: INTERNAL LINKS -->
+          <div id="stageInternalLinks" class="stage-panel">
+            <div class="panel-inner">
+              <div class="links-header">
+                <div>
+                  <h3>Internal Linking Opportunities & Injection Status</h3>
+                  <p class="sub-hint">Matched from the 322+ Google Sheet database. The AI selects the best 3–5 opportunities to weave naturally into body paragraphs.</p>
+                </div>
+                <button type="button" id="btnRefreshLinks" class="btn btn-secondary btn-sm">Re-scan Database</button>
+              </div>
+
+              <div id="selectedLinksList" class="selected-links-table-container">
+                <p class="placeholder-text">No internal links selected yet. Click "Find Database Internal Links" or generate the article.</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- STAGE: RAW MARKDOWN -->
+          <div id="stageMarkdown" class="stage-panel">
+            <div class="panel-inner">
+              <div class="markdown-header">
+                <div>
+                  <h3>Raw Markdown Source</h3>
+                  <p class="sub-hint">Directly editable: edits dynamically update word count, Flesch score, and the audit checklist in real time.</p>
+                </div>
+                <button type="button" id="btnCopyMarkdown" class="btn btn-secondary btn-sm">📋 Copy Markdown</button>
+              </div>
+              <textarea id="rawMarkdownViewer" class="code-editor" placeholder="# Your draft will appear here..."></textarea>
+            </div>
+          </div>
+
+        </section>
+
+        <!-- RIGHT COLUMN: PUBLISH & EXPORT (GOOGLE DOC UNIFIED VERSION) -->
+        <aside class="audit-panel export-focused-panel">
+          <div class="panel-header">
+            <h2>Publish & Export</h2>
+            <span id="auditScoreBadge" class="audit-badge audit-passed">Google Doc Ready</span>
+          </div>
+
+          <!-- PRIMARY GOOGLE DOC 1-CLICK EXPORT -->
+          <div class="gdoc-primary-export-box">
+            <button type="button" id="btnCopyGoogleDocs" class="btn btn-gdocs-hero">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/>
+              </svg>
+              <span>Copy Complete Google Doc (Exact Copy)</span>
+            </button>
+            <div class="gdoc-action-btn-row">
+              <button type="button" id="btnOpenDocsNew" class="btn btn-secondary btn-sm" title="Copies document & opens fresh Google Doc ready for Ctrl+V">
+                ↗️ Open docs.new (Paste Ctrl+V)
+              </button>
+              <button type="button" id="btnDownloadDocFile" class="btn btn-secondary btn-sm" title="Download .doc file directly for Word / Google Drive">
+                📥 Download .doc File
+              </button>
+            </div>
+            <p class="export-sub-text">
+              <strong>Unified Exact Copy:</strong> Copies Step 1 (Competitor Intel), Step 2 & 3 (Intent & SEO Metadata + Alt Texts), and Step 4 (Full Article with active links, tables & FAQs) combined in a single formatted doc ready to paste directly into Google Docs.
+            </p>
+          </div>
+
+          <!-- CONTENT VITALS & QUALITY SUMMARY (ALL RULES MET IN 1 SHOT) -->
+          <div class="content-vitals-card">
+            <h3>Content Vitals (All Standards Met in 1 Shot)</h3>
+            <div class="vital-row">
+              <span class="vital-label">Word Count:</span>
+              <div class="vital-action-wrap">
+                <span class="vital-val" id="vitalWordCount">0 words (Floor: 1,200)</span>
+                <button type="button" class="btn-vital-fix hidden" id="btnFixWordCount" title="Expand draft to reach required word count">⚡ Fix</button>
+              </div>
+            </div>
+            <div class="vital-row">
+              <span class="vital-label">Flesch Reading Ease:</span>
+              <div class="vital-action-wrap">
+                <span class="vital-val" id="vitalFlesch">~50 (Target: 45–60)</span>
+                <button type="button" class="btn-vital-fix hidden" id="btnFixFlesch" title="Balance readability score ~50">⚡ Fix</button>
+              </div>
+            </div>
+            <div class="vital-row">
+              <span class="vital-label">Primary Keyword:</span>
+              <div class="vital-action-wrap">
+                <span class="vital-val" id="vitalPrimaryCount">0 occurrences (Target: 3–5)</span>
+                <button type="button" class="btn-vital-fix hidden" id="btnFixPrimaryCount" title="Adjust primary keyword count to 3-5 times">⚡ Fix</button>
+              </div>
+            </div>
+            <div class="vital-row">
+              <span class="vital-label">Internal Links:</span>
+              <div class="vital-action-wrap">
+                <span class="vital-val" id="vitalInternalLinks">0 live URLs from sheet</span>
+                <button type="button" class="btn-vital-fix hidden" id="btnFixInternalLinks" title="Embed missing internal links from approved sheet">⚡ Fix Links</button>
+              </div>
+            </div>
+            <div class="vital-row">
+              <span class="vital-label">External Authority:</span>
+              <div class="vital-action-wrap">
+                <span class="vital-val" id="vitalExternalLinks">1–2 links (APA, Gottman, etc.)</span>
+                <button type="button" class="btn-vital-fix hidden" id="btnFixExternalLinks" title="Add authoritative citation link">⚡ Fix</button>
+              </div>
+            </div>
+            <div class="vital-row">
+              <span class="vital-label">FAQ Section:</span>
+              <div class="vital-action-wrap">
+                <span class="vital-val" id="vitalFaqs">4–6 Q&As included</span>
+                <button type="button" class="btn-vital-fix hidden" id="btnFixFaqs" title="Add missing FAQs to reach 4-6 questions">⚡ Fix</button>
+              </div>
+            </div>
+            <div class="vital-row">
+              <span class="vital-label">Brand Voice & Punctuation:</span>
+              <div class="vital-action-wrap">
+                <span class="vital-val" id="vitalVoice">0 em dashes, &le;20 words/sent</span>
+                <button type="button" class="btn-vital-fix hidden" id="btnFixVoice" title="Clean em dashes from article">⚡ Fix</button>
+              </div>
+            </div>
+
+            <!-- AUTO-ALIGN VITALS BUTTON -->
+            <div class="auto-align-container">
+              <button type="button" id="btnAutoAlignVitals" class="btn btn-align-vitals">
+                ⚡ Auto-Align Vitals (Expand to 1,400+ & Balance ~50)
+              </button>
+              <p class="vitals-helper-hint">
+                If word count is under 1,200 or Flesch needs balancing, 1 click automatically expands and aligns all vitals.
+              </p>
+            </div>
+          </div>
+        </aside>
+
+      </div>
+    </div>
+
+    <!-- MASTER SHEET EXPLORER TAB -->
+    <div id="sheetExplorerTab" class="tab-view">
+      <div class="explorer-card">
+        <div class="explorer-header">
+          <div>
+            <h2>Master Content & Internal Links Database</h2>
+            <p class="sub-hint">Real-time sync with Google Sheet: <code>1sQafuhPo34p_2Pn28hbj0tezDQyOofvf7n2tMLghTjE</code> (Tab: <code>your2am content</code>)</p>
+          </div>
+          <div class="explorer-search-bar">
+            <input type="text" id="sheetSearchInput" placeholder="Search keywords, categories, or URLs...">
+            <select id="sheetCatFilter">
+              <option value="">All Categories</option>
+              <option value="relationship">Relationship</option>
+              <option value="love">Love</option>
+              <option value="dating">Dating</option>
+              <option value="breakup">Breakup</option>
+              <option value="romance">Romance</option>
+              <option value="anxiety">Anxiety</option>
+              <option value="depression">Depression</option>
+            </select>
+            <button id="btnReloadSheet" class="btn btn-secondary btn-sm">🔄 Reload</button>
+          </div>
+        </div>
+
+        <div class="table-responsive">
+          <table class="data-table" id="sheetTable">
+            <thead>
+              <tr>
+                <th width="12%">Category</th>
+                <th width="28%">Primary Keyword</th>
+                <th width="25%">Secondary Keywords</th>
+                <th width="35%">Live URL</th>
+              </tr>
+            </thead>
+            <tbody id="sheetTableBody">
+              <tr><td colspan="4" class="text-center">Loading master database...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- SAVED DRAFTS TAB -->
+    <div id="draftsTab" class="tab-view">
+      <div class="explorer-card">
+        <div class="explorer-header">
+          <div>
+            <h2>Saved Article Drafts</h2>
+            <p class="sub-hint">Locally stored drafts in <code>c:\Antigravity\content_writing_automation\drafts\</code></p>
+          </div>
+          <button id="btnRefreshDrafts" class="btn btn-secondary btn-sm">🔄 Refresh List</button>
+        </div>
+
+        <div class="table-responsive">
+          <table class="data-table" id="draftsTable">
+            <thead>
+              <tr>
+                <th width="35%">Article Title</th>
+                <th width="20%">Primary Keyword</th>
+                <th width="20%">Last Modified</th>
+                <th width="10%">Size</th>
+                <th width="15%">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="draftsTableBody">
+              <tr><td colspan="5" class="text-center">No saved drafts yet.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+  <!-- IMPORT DRAFT MODAL -->
+  <div id="importModal" class="modal-overlay hidden">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3>Paste / Import Generated Draft</h3>
+        <button id="btnCloseImportModal" class="btn-close">&times;</button>
+      </div>
+      <div class="modal-body">
+        <p class="input-hint" style="margin-bottom: 12px;">Paste the full generated Markdown output (including metadata and steps, or just the article). The engine will parse it and run the full 11-point audit checklist.</p>
+        <textarea id="importDraftInput" class="code-editor" style="height: 350px;" placeholder="Paste generated text here..."></textarea>
+      </div>
+      <div class="modal-footer">
+        <button type="button" id="btnApplyImportDraft" class="btn btn-primary">Apply & Audit Draft</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="/app.js?v=20261011_v6_safe"></script>
+</body>
+</html>
