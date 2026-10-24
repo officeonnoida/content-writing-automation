@@ -486,8 +486,10 @@ const server = http.createServer(async (req, res) => {
       }
     }
 
-    // 9. Static Files (Public directory)
+    // 9. Static Files (Public directory & root directory fallback)
     const sanitizedPath = path.normalize(pathname).replace(/^(\.\.[\/\\])+/, "");
+    const relativePath = sanitizedPath === "/" || sanitizedPath === "\\" ? "index.html" : sanitizedPath.replace(/^[\/\\]/, "");
+    
     // Check in public/ first, then fall back to root directory
     let filePath = path.join(PUBLIC_DIR, relativePath);
     if (!fs.existsSync(filePath) || !fs.statSync(filePath).isFile()) {
