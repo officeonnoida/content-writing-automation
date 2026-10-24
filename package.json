@@ -1,0 +1,20 @@
+{
+  "name": "your2amfriend-content-engine",
+  "version": "1.0.0",
+  "description": "Your 2AM Friend - Master Content Engine",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "keywords": [
+    "content-creation",
+    "seo",
+    "gemini-ai",
+    "content-automation"
+  ],
+  "author": "Your 2AM Friend",
+  "license": "ISC"
+}
